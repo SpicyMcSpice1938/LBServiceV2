@@ -4,12 +4,12 @@ import java.util.Map;
 
 public class DistributionDTO {
     private String username;
-    private Map<Integer, Integer> frequencyDistribuition;
+    private Map<Integer, Integer> frequencyDistribution;
     private int totalMovies;
 
-    public DistributionDTO(String username, Map<Integer, Integer> frequencyDistribuition) {
+    public DistributionDTO(String username, Map<Integer, Integer> frequencyDistribution) {
         this.username = username;
-        this.frequencyDistribuition = frequencyDistribuition;
+        this.frequencyDistribution = frequencyDistribution;
         this.totalMovies = calculateTotalMovies();
     }
 
@@ -21,12 +21,12 @@ public class DistributionDTO {
         this.username = username;
     }
 
-    public Map<Integer, Integer> getFrequencyDistribuition() {
-        return frequencyDistribuition;
+    public Map<Integer, Integer> getFrequencyDistribution() {
+        return frequencyDistribution;
     }
 
-    public void setFrequencyDistribuition(Map<Integer, Integer> frequencyDistribuition) {
-        this.frequencyDistribuition = frequencyDistribuition;
+    public void setFrequencyDistribution(Map<Integer, Integer> frequencyDistribution) {
+        this.frequencyDistribution = frequencyDistribution;
     }
 
     public int getTotalMovies() {
@@ -38,7 +38,7 @@ public class DistributionDTO {
     }
 
     private int calculateTotalMovies() {
-        return frequencyDistribuition.values().stream()
+        return frequencyDistribution.values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
     }

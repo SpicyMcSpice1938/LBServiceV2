@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import UserStatsPage from "./UserStatsPage";
+import UserStatsPage from "./WatchedStatsPage";
 import SearchBar from "./SearchBar"
 
 
@@ -10,7 +10,7 @@ export default function LandingPage(){
       <main>
         {/* dynamic content area. search bar will always be present */}
         <Routes>
-          <Route path='/userstats/:username' element={<UserStatsPage/>} />
+          <Route path='/watched/:username' element={<UserStatsPage/>} />
         </Routes>
       </main>
 		</>

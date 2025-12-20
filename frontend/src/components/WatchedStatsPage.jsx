@@ -70,24 +70,12 @@ export default function UserStatsPage() {
     const sortedEntries = Object.entries(userStats.frequencyDistribution)
         .sort(([yearA], [yearB]) => Number(yearA) - Number(yearB));
     
-    let years = sortedEntries.map(([year]) => year);
-    let freq = sortedEntries.map(([, frequency]) => frequency);
-    const originalYearsNumeric = years.map(y => Number(y));
+    const years = sortedEntries.map(([year]) => year);
+    const freq = sortedEntries.map(([, frequency]) => frequency);
+    const yearsNumeric = years.map(y => Number(y));
 
-    const availableMinYear = Math.min(...originalYearsNumeric);
-    const availableMaxYear = Math.max(...originalYearsNumeric);
-
-    // Fill in missing years with 0 frequency
-    const filledYearsNumeric = [];
-    const filledFreq = [];
-    for (let year = availableMinYear; year <= availableMaxYear; year++) {
-        const index = originalYearsNumeric.indexOf(year);
-        filledYearsNumeric.push(year);
-        filledFreq.push(index !== -1 ? freq[index] : 0);
-    }
-    years = filledYearsNumeric.map(y => String(y));
-    freq = filledFreq;
-    const yearsNumeric = filledYearsNumeric;
+    const availableMinYear = Math.min(...yearsNumeric);
+    const availableMaxYear = Math.max(...yearsNumeric);
 
     const transpose = (matrix) => {
         return matrix[0].map((_, i) => matrix.map(row => row[i]));
@@ -170,46 +158,68 @@ export default function UserStatsPage() {
     };
 
     const handleCalculate = () => {
-        // Filter data based on year bounds
-        let filteredYears = yearsNumeric;
-        let filteredFreq = freq;
-        let filteredYearsStr = years;
 
-        if (minYearBound !== null || maxYearBound !== null) {
-            const minYear = minYearBound ?? -Infinity;
-            const maxYear = maxYearBound ?? Infinity;
-            
-            const indices = yearsNumeric
-                .map((year, i) => ({ year, index: i }))
-                .filter(({ year }) => year >= minYear && year <= maxYear)
-                .map(({ index }) => index);
-            
-            filteredYears = indices.map(i => yearsNumeric[i]);
-            filteredFreq = indices.map(i => freq[i]);
-            filteredYearsStr = indices.map(i => years[i]);
-        }
+        //Fill in missing years with zero frequency
+        const yearsNumericRaw = sortedEntries.map(([year]) => Number(year));
+        const minYear = Math.min(...yearsNumericRaw);
+        const maxYear = Math.max(...yearsNumericRaw);
         
+        const completeEntries = [];
+        for (let year = minYear; year <= maxYear; year++) {
+            const existing = sortedEntries.find(([y]) => Number(y) === year);
+            if (existing) {
+                completeEntries.push(existing);
+            } else {
+                completeEntries.push([String(year), 0]);
+            }
+        }
+
+        // filter based on user (state) defined bounds
+        const finalMin = minYearBound ?? availableMinYear;
+        const finalMax = maxYearBound ?? availableMaxYear;
+
+        const filteredData = completeEntries.filter(([year]) => {
+            const y = Number(year);
+            return y >= finalMin && y <= finalMax;
+        });
+
+        // Extract final arrays for calculation
+        const filteredYears = filteredData.map(([year]) => Number(year));
+        const filteredFreq = filteredData.map(([, frequency]) => frequency);
+        const filteredYearsStr = filteredData.map(([year]) => year);
+
+        // Validation
         if (filteredYears.length <= sliderDegree) {
             alert(`Not enough data points for degree ${sliderDegree}. Need at least ${sliderDegree + 1} points.`);
             return;
         }
 
-        const coeffs = polyRegression(filteredYears, filteredFreq, sliderDegree);
-        
-        const fitted = filteredYears.map(x => {
-            let value = coeffs.reduce((sum, coeff, i) => sum + coeff * Math.pow(x, i), 0);
-            // Apply floor value
-            return Math.max(value, floor);
-        });
-        const resid = filteredFreq.map((val, i) => val - fitted[i]);
-        setFittedValues(fitted);
-        setResiduals(resid);
-        setFilteredYearsDisplay(filteredYearsStr);
-        setFilteredFreqDisplay(filteredFreq);
-        // update the applied degree only when calculation is performed
-        setAppliedDegree(sliderDegree);
-    }; 
+        // Data centering to prevent floating point overflow
+        const yearOffset = Math.min(...filteredYears);
+        const centeredYears = filteredYears.map(y => y - yearOffset);
 
+        try {
+            const coeffs = polyRegression(centeredYears, filteredFreq, sliderDegree);
+            
+            const fitted = centeredYears.map(x => {
+                let value = coeffs.reduce((sum, coeff, i) => sum + coeff * Math.pow(x, i), 0);
+                return Math.max(value, floor); // Apply the floor
+            });
+
+            const resid = filteredFreq.map((val, i) => val - fitted[i]);
+
+            // Update state
+            setFittedValues(fitted);
+            setResiduals(resid);
+            setFilteredYearsDisplay(filteredYearsStr);
+            setFilteredFreqDisplay(filteredFreq);
+            setAppliedDegree(sliderDegree);
+
+        } catch (err) {
+            console.error("Regression error:", err);
+            alert("Calculation failed. Try a lower degree or check your data range.");
+        }
+    };
     const mainPlotData = [
         {
             x: years,
@@ -301,8 +311,8 @@ export default function UserStatsPage() {
                     </label>
                     <input 
                         type="range" 
-                        min={1} 
-                        max={6}
+                        min={0} 
+                        max={10}
                         value={sliderDegree}
                         onChange={(e) => setSliderDegree(Number(e.target.value))}
                         style={{ width: '100%' }}
@@ -355,6 +365,7 @@ export default function UserStatsPage() {
                                 width: '80px'
                             }}
                             placeholder="All"
+                            max={availableMaxYear ?? new Date().getFullYear}
                         />
                     </label>
                 </div>

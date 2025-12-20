@@ -7,9 +7,9 @@ import LandingPage from './components/LandingPage';
 
 function App() {
   return (
-    <BrowserRouter> {/*Router wraps the entire app */}
+    <BrowserRouter> 
 			<header>
-        {/* navigation? */}
+        
 			</header>      
       <LandingPage /> 
 		</BrowserRouter>

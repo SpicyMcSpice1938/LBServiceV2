@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import UserStatsPage from "./UserStatsPage";
+import UserStatsPage from "./WatchedStatsPage";
 
 
 export default function SearchBar(){

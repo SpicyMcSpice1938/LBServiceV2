@@ -9,7 +9,7 @@ import java.time.Duration;
 
 @Repository
 public class LbDistributionRepository {
-    private static final String KEY_PREFIX = "letterboxd:distribution:";
+    private static final String KEY_PREFIX = "letterboxd:watched:distribution:";
 
     private final RedisTemplate<String, DistributionDTO> redisTemplate;
 
