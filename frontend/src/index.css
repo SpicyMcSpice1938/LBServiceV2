@@ -54,6 +54,49 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.user-stats-div{
+    width: 1200px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 4px;
+    padding: 20px
+}
+
+.regression-controls{
+  color: black;
+}
+
+.year-bounds-controls input, .floor-controls input {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 14px;
+  width: 80px;
+}
+
+.residuals-list{
+  width: 200px;
+  flex-shrink: 0;
+  background-color: white;
+  border-radius: 4px;
+  padding: 15px;
+  box-shadow: 0, 2px, 4px, black;
+  max-height: 1000px;
+  overflow-y: auto;
+}
+
+.residuals-list .residual-item{
+  padding: 8px;
+  border-bottom: 1px, solid, #eee;
+  font-size: 12px;
+  color: #333;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
