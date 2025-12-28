@@ -26,16 +26,17 @@ export default function UserStatsPage() {
     const [maxYearBound, setMaxYearBound] = useState(new Date().getFullYear());
 
     useEffect(() => {
-        const url = import.meta.env.VITE_API_URL;
-        
-        fetch(`${url}/api/distribution/${username}`)
+        const base_API_URL  = import.meta.env.VITE_API_URL;
+        setLoading(true)
+        fetch(`${base_API_URL}/distribution/${username}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
+                    throw new Error(`HTTP error ${res.status}`);
                 }
                 return res.json();
             })
             .then(data => {
+                setError(null)
                 setUserStats(data);
                 setLoading(false);
             })
@@ -46,10 +47,26 @@ export default function UserStatsPage() {
             });
     }, [username]);
 
+    // Reset regression state when username changes
+    useEffect(() => {
+        setFittedValues(null);
+        setResiduals(null);
+        setFilteredYearsDisplay(null);
+        setFilteredFreqDisplay(null);
+        setAppliedDegree(1);
+        setSliderDegree(1);
+        setFloor(0);
+        setMinYearBound(null);
+        setMaxYearBound(new Date().getFullYear());
+    }, [username]);
+
     
 
     if (loading) {
-        return <div style={{ padding: '20px' }}>Loading...</div>;
+        return <>
+            <div style={{ padding: '20px' }}>Loading...</div>
+            <div style={{ padding: '20px' }}>Scraping operations may take a while based on how many movies the user has watched</div>
+            </>;
     }
 
     if (error) {
