@@ -2,3 +2,9 @@
 compose.yaml
 */Dockerfile
 *application*.yml
+/frontend/.env.development
+frontend/.env.development
+*.development
+*.odt*
+/frontend/nginx.conf
+*.conf
