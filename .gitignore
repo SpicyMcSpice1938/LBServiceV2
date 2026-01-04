@@ -8,3 +8,4 @@ frontend/.env.development
 *.odt*
 /frontend/nginx.conf
 *.conf
+frontend/nginx.conf

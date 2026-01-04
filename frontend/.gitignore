@@ -26,3 +26,4 @@ dist-ssr
 # config
 .env.production
 .env.development
+nginx.conf
