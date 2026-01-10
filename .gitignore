@@ -9,3 +9,4 @@ frontend/.env.development
 /frontend/nginx.conf
 *.conf
 frontend/nginx.conf
+.env
