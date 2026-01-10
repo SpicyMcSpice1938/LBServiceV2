@@ -2,6 +2,7 @@ package com.spicymcspice.LbDistribution.config;
 
 import com.spicymcspice.LbDistribution.dto.DistributionDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,15 +16,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 @Configuration
+@ConditionalOnProperty(name = "app.cache.type", havingValue = "redis", matchIfMissing = false)
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
+    @Value("${spring.data.redis.host:localhost}")
     private String redisHost;
 
-    @Value("${spring.data.redis.port}")
+    @Value("${spring.data.redis.port:6379}")
     private int redisPort;
 
-    @Value("${spring.data.redis.password}")
+    @Value("${spring.data.redis.password:#{null}}") // Using SpEL to handle null password
     private String redisPassword;
 
     @Bean
@@ -31,7 +33,10 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
         redisConfig.setHostName(redisHost);
         redisConfig.setPort(redisPort);
-        redisConfig.setPassword(redisPassword);
+
+        if (redisPassword != null && !redisPassword.isEmpty()) {
+            redisConfig.setPassword(redisPassword);
+        }
 
         JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfig =
                 JedisClientConfiguration.builder();

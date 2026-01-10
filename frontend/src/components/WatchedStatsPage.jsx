@@ -191,6 +191,20 @@ export default function UserStatsPage() {
                 dash: 'dash'
             },
             showlegend: false
+        },
+        {
+            x: filteredYearsDisplay || years,
+            y: Array((filteredYearsDisplay || years).length).fill(-1),
+            type: 'scatter',
+            mode: 'lines',
+            name: 'y = -1',
+            line: {
+                color: 'black',
+                width: 1,
+                dash: 'dot'
+            },
+            hoverinfo: 'skip',
+            showlegend: true
         }
     ] : [];
 
